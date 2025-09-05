@@ -10,23 +10,57 @@ class TabProcessor {
         this.cache = new Map(); // Simple in-memory cache for this session
     }
 
-    loadConfig(configPath) {
+    loadConfig(configPath = './config.yaml') {
+        const path = require('path');
+        
+        // Always load defaults first
+        const defaultConfigPath = path.join(__dirname, 'config.default.yaml');
+        let config;
+        
         try {
-            const configContent = fs.readFileSync(configPath, 'utf8');
-            const config = yaml.load(configContent);
-            
-            // Expand home directory paths
-            if (config.backup_json.startsWith('~')) {
-                config.backup_json = config.backup_json.replace('~', require('os').homedir());
-            }
-            if (config.output_dir.startsWith('~')) {
-                config.output_dir = config.output_dir.replace('~', require('os').homedir());
-            }
-            
-            return config;
+            const defaultContent = fs.readFileSync(defaultConfigPath, 'utf8');
+            config = yaml.load(defaultContent);
         } catch (error) {
-            throw new Error(`Failed to load config: ${error.message}`);
+            throw new Error(`Failed to load default config: ${error.message}`);
         }
+        
+        // Try to load and merge user config if it exists
+        if (fs.existsSync(configPath)) {
+            try {
+                const userContent = fs.readFileSync(configPath, 'utf8');
+                const userConfig = yaml.load(userContent);
+                
+                // Deep merge user config over defaults
+                config = this.mergeConfig(config, userConfig);
+            } catch (error) {
+                console.warn(`Warning: Failed to load user config ${configPath}, using defaults: ${error.message}`);
+            }
+        }
+        
+        // Expand home directory paths
+        if (config.backup_json && config.backup_json.startsWith('~')) {
+            config.backup_json = config.backup_json.replace('~', require('os').homedir());
+        }
+        if (config.output_dir && config.output_dir.startsWith('~')) {
+            config.output_dir = config.output_dir.replace('~', require('os').homedir());
+        }
+        
+        return config;
+    }
+
+    // Deep merge helper
+    mergeConfig(defaults, user) {
+        const result = { ...defaults };
+        
+        for (const key in user) {
+            if (user[key] && typeof user[key] === 'object' && !Array.isArray(user[key])) {
+                result[key] = this.mergeConfig(defaults[key] || {}, user[key]);
+            } else {
+                result[key] = user[key];
+            }
+        }
+        
+        return result;
     }
 
     // Extract tab IDs from backup JSON

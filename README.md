@@ -2,7 +2,6 @@
 
 Extract guitar tabs from a [**TabsLite** Android app](https://github.com/More-Than-Solitaire/Tabs-Lite) backup file using the Ultimate Guitar API.
 
-
 ## Setup
 
 In **Tabs Lite**, go to **Settings** (Guitar in search field) > **Export favorits and playlists**.
@@ -17,7 +16,7 @@ This will save **`tabslite_backup.json`** on your phone. Copy this to your compu
 
 2. Configure the extractor.
    ```bash
-   cp config.example.yaml config.yaml
+   cp config.default.yaml config.yaml
    ```
    Then edit the settings.
    ```yaml

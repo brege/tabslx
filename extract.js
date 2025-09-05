@@ -26,17 +26,15 @@ Options:
   -f, --force          Force re-download even if files exist
   -h, --help           Show this help message
 
-Config file should contain:
-  backup_json: path to TabsLite backup JSON
-  output_dir: where to save extracted tabs
-  cache: whether to skip existing files
-  formatting: content formatting options
-  filename: filename formatting options
+Config:
+  Defaults loaded from config.default.yaml
+  User config.yaml overrides defaults (optional)
+  Copy config.default.yaml to config.yaml to customize
 
 Examples:
-  node extract.js
-  node extract.js --config /path/to/config.yaml
-  node extract.js --force
+  node extract.js                    # Use defaults + config.yaml
+  node extract.js --force            # Force re-download
+  node extract.js --config my.yaml   # Custom config file
 `);
             process.exit(0);
         }

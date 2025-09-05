@@ -1,0 +1,17 @@
+# TabsLite Extractor Default Configuration
+# Copy to config.yaml and customize
+
+backup_json: "tabslite_backup.json"
+output_dir: "tabslite-export"
+cache: true
+
+formatting:
+  remove_markup: true
+  blank_after_tabs: true
+  include_id: false
+
+filename:
+  lowercase: false
+  replace_spaces_with: false
+  pattern: "{artist} - {song} ({id}).txt"
+

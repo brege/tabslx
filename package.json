@@ -6,11 +6,6 @@
   "bin": {
     "tabs-lite-extract": "./extract.js"
   },
-  "scripts": {
-    "start": "node extract.js",
-    "extract": "node extract.js",
-    "extract:force": "node extract.js --force"
-  },
   "dependencies": {
     "js-yaml": "^4.1.0"
   },

@@ -1,0 +1,30 @@
+# Tabs-Lite Extractor Configuration Example
+# Copy this file to config.yaml and customize for your setup
+
+# Path to your TabsLite backup JSON file
+backup_json: "tabslite_backup.json"
+
+# Directory to save tab files
+output_dir: "tabslite-export"
+
+# Skip files that already exist (use --force to override)
+cache: true
+
+# Formatting options for the output files
+formatting:
+  # Remove [ch], [/ch], [tab], [/tab] markup tags
+  remove_markup: true
+  # Add blank line after tab sections
+  blank_after_tabs: true
+  # Include Ultimate Guitar tab ID in filename
+  include_id: false
+
+# Filename formatting options
+filename:
+  # Convert artist and song names to lowercase
+  lowercase: false
+  # Replace spaces (false, "_", "-", etc)
+  replace_spaces_with: false
+  # Filename pattern
+  pattern: "{artist} - {song} ({id}).txt"
+

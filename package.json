@@ -1,0 +1,20 @@
+{
+  "name": "tabslite-extractor",
+  "version": "1.0.0",
+  "description": "Extract guitar tabs from TabsLite backup files",
+  "main": "extract.js",
+  "bin": {
+    "tabs-lite-extract": "./extract.js"
+  },
+  "scripts": {
+    "start": "node extract.js",
+    "extract": "node extract.js",
+    "extract:force": "node extract.js --force"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "keywords": ["guitar", "tabs", "ultimate-guitar", "tabslite"],
+  "author": "",
+  "license": "MIT"
+}

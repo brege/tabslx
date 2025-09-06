@@ -1,23 +1,23 @@
 #!/usr/bin/env node
+// lint-copy/extract.js
 
 const TabProcessor = require('./processor');
-const path = require('path');
 
 async function main() {
-    const args = process.argv.slice(2);
-    let configPath = './config.yaml';
-    let force = false;
+  const args = process.argv.slice(2);
+  let configPath = './config.yaml';
+  let force = false;
 
-    // Parse command line arguments
-    for (let i = 0; i < args.length; i++) {
-        const arg = args[i];
-        if (arg === '--config' || arg === '-c') {
-            configPath = args[i + 1];
-            i++;
-        } else if (arg === '--force' || arg === '-f') {
-            force = true;
-        } else if (arg === '--help' || arg === '-h') {
-            console.log(`TabsLite Extractor
+  // Parse command line arguments
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--config' || arg === '-c') {
+      configPath = args[i + 1];
+      i++;
+    } else if (arg === '--force' || arg === '-f') {
+      force = true;
+    } else if (arg === '--help' || arg === '-h') {
+      console.log(`TabsLite Extractor
 
 Usage: node extract.js [options]
 
@@ -36,22 +36,22 @@ Examples:
   node extract.js --force            # Force re-download
   node extract.js --config my.yaml   # Custom config file
 `);
-            process.exit(0);
-        }
+      process.exit(0);
     }
+  }
 
-    try {
-        const processor = new TabProcessor(configPath);
-        await processor.extractAllTabs(force);
-        console.log('All done!');
-    } catch (error) {
-        console.error('Error:', error.message);
-        process.exit(1);
-    }
+  try {
+    const processor = new TabProcessor(configPath);
+    await processor.extractAllTabs(force);
+    console.log('All done!');
+  } catch (error) {
+    console.error('Error:', error.message);
+    process.exit(1);
+  }
 }
 
 if (require.main === module) {
-    main();
+  main();
 }
 
 module.exports = { main };

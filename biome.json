@@ -1,0 +1,72 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noCommentText": "error",
+        "noDebugger": "error",
+        "noDoubleEquals": "error",
+        "noUnsafeDeclarationMerging": "error"
+      },
+      "style": {
+        "noNegationElseIf": "error",
+        "noNonNullAssertion": "error",
+        "noParameterAssign": "error",
+        "useConst": "error",
+        "useExponentOperator": "error",
+        "useTemplate": "error",
+        "useWhile": "error"
+      },
+      "correctness": {
+        "noConstAssign": "error",
+        "noConstantCondition": "error",
+        "noGlobalObjectCalls": "error",
+        "noInvalidUseBeforeDeclaration": "error",
+        "noNewSymbol": "error",
+        "noNonoctalDecimalEscape": "error",
+        "noPrecisionLoss": "error",
+        "noSelfAssign": "error",
+        "noSetterReturn": "error",
+        "noStringCaseMismatch": "error",
+        "noUndeclaredVariables": "error",
+        "noUnusedLabels": "error",
+        "noUnusedVariables": "error",
+        "useIsNan": "error",
+        "useValidForDirection": "error",
+        "useYield": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "asNeeded",
+      "bracketSpacing": true,
+      "indentSize": 2,
+      "indentStyle": "space",
+      "jsxQuoteStyle": "double",
+      "lineEnding": "lf",
+      "lineWidth": 100,
+      "quoteProperties": "asNeeded",
+      "quotes": "single",
+      "semicolons": "always",
+      "trailingComma": "es5"
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "json": {
+    "formatter": {
+      "indentSize": 2,
+      "indentStyle": "space",
+      "lineEnding": "lf",
+      "lineWidth": 100,
+      "trailingComma": "none"
+    }
+  }
+}

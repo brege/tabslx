@@ -1,6 +1,6 @@
-// lint-copy/processor.js
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const yaml = require('js-yaml');
 const UGApiClient = require('./api');
 
@@ -8,12 +8,9 @@ class TabProcessor {
   constructor(configPath = './config.yaml') {
     this.config = this.loadConfig(configPath);
     this.api = new UGApiClient();
-    this.cache = new Map(); // Simple in-memory cache for this session
   }
 
   loadConfig(configPath = './config.yaml') {
-    const path = require('path');
-
     // Always load defaults first
     const defaultConfigPath = path.join(__dirname, 'config.default.yaml');
     let config;
@@ -39,17 +36,12 @@ class TabProcessor {
     }
 
     // Expand home directory paths
-    if (config.backup_json && config.backup_json.startsWith('~')) {
-      config.backup_json = config.backup_json.replace('~', require('os').homedir());
-    }
-    if (config.output_dir && config.output_dir.startsWith('~')) {
-      config.output_dir = config.output_dir.replace('~', require('os').homedir());
-    }
+    config.backup_json = this.expandPath(config.backup_json);
+    config.output_dir = this.expandPath(config.output_dir);
 
     return config;
   }
 
-  // Deep merge helper
   mergeConfig(defaults, user) {
     const result = { ...defaults };
 
@@ -64,18 +56,30 @@ class TabProcessor {
     return result;
   }
 
-  // Extract tab IDs from backup JSON
+  expandPath(pathValue) {
+    if (pathValue && pathValue.startsWith('~')) {
+      return pathValue.replace('~', os.homedir());
+    }
+    return pathValue;
+  }
+
+  sanitizeFilename(text) {
+    return text.replace(/[<>:"/\\|?*]/g, '_');
+  }
+
   extractTabIds(backupPath) {
     try {
       const backupData = JSON.parse(fs.readFileSync(backupPath, 'utf8'));
       const tabIds = [];
+      const seen = new Set();
 
       // Extract from playlists in order
       if (backupData.playlists) {
         backupData.playlists.forEach(playlist => {
           if (playlist.entries) {
             playlist.entries.forEach(entry => {
-              if (entry.tabId && !tabIds.includes(entry.tabId)) {
+              if (entry.tabId && !seen.has(entry.tabId)) {
+                seen.add(entry.tabId);
                 tabIds.push(entry.tabId);
               }
             });
@@ -97,7 +101,6 @@ class TabProcessor {
     let song = tabData.song_name || 'Unknown Song';
     const id = tabData.tab_id || tabData.id || 'unknown';
 
-    // Apply formatting rules
     if (filename.lowercase) {
       artist = artist.toLowerCase();
       song = song.toLowerCase();
@@ -108,17 +111,13 @@ class TabProcessor {
       song = song.replace(/\s+/g, filename.replace_spaces_with);
     }
 
-    // Remove invalid filename characters
-    artist = artist.replace(/[<>:"/\\|?*]/g, '_');
-    song = song.replace(/[<>:"/\\|?*]/g, '_');
+    artist = this.sanitizeFilename(artist);
+    song = this.sanitizeFilename(song);
 
-    // Generate filename using pattern
-    let filename_str = filename.pattern
+    return filename.pattern
       .replace('{artist}', artist)
       .replace('{song}', song)
       .replace('{id}', id);
-
-    return filename_str;
   }
 
   // Format tab content according to config
@@ -139,16 +138,7 @@ URL: ${tabData.url_web || 'N/A'}
 ${tabData.content}`;
 
     if (formatting.remove_markup) {
-      // Remove [ch] and [/ch] tags
-      content = content.replace(/\[ch\]/g, '').replace(/\[\/ch\]/g, '');
-
-      // Remove [tab] and [/tab] tags
-      content = content.replace(/\[tab\]/g, '').replace(/\[\/tab\]/g, '');
-
-      // Handle ^M (carriage return) - replace with proper newlines
-      content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-      // Clean up multiple blank lines but preserve single blank lines
+      content = content.replace(/\[(\/?)ch\]/g, '').replace(/\[(\/?)tab\]/g, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
       content = content.replace(/\n{3,}/g, '\n\n');
     }
 
@@ -208,12 +198,6 @@ ${tabData.content}`;
       try {
         console.log(`Processing tab ${i + 1}/${tabIds.length}: ID ${tabId}`);
 
-        // Check cache first if not forcing
-        if (!force && this.config.cache) {
-          // We need to fetch tab data to generate filename, but we can check existence
-          // For now, let's fetch and check after
-        }
-
         const tabData = await this.api.fetchTab(tabId);
         const result = this.saveTab(tabData, force);
 
@@ -225,8 +209,7 @@ ${tabData.content}`;
           successful++;
         }
 
-        // Rate limiting - wait 1 second between requests
-        if (i < tabIds.length - 1) { // Don't wait after the last request
+        if (i < tabIds.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       } catch (error) {

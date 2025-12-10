@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// lint-copy/extract.js
 
 const TabProcessor = require('./processor');
 
@@ -8,10 +7,13 @@ async function main() {
   let configPath = './config.yaml';
   let force = false;
 
-  // Parse command line arguments
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '--config' || arg === '-c') {
+      if (!args[i + 1]) {
+        console.error('Error: --config requires a path argument');
+        process.exit(1);
+      }
       configPath = args[i + 1];
       i++;
     } else if (arg === '--force' || arg === '-f') {
@@ -53,5 +55,3 @@ Examples:
 if (require.main === module) {
   main();
 }
-
-module.exports = { main };

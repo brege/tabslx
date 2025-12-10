@@ -1,4 +1,3 @@
-// lint-copy/api.js
 const https = require('https');
 const crypto = require('crypto');
 
@@ -6,6 +5,8 @@ class UGApiClient {
   constructor() {
     this.deviceId = this.generateDeviceId();
     this.apiKey = null;
+    this.retryCount = 0;
+    this.maxRetries = 3;
   }
 
   // Generate a 16-character hex device ID
@@ -23,60 +24,61 @@ class UGApiClient {
     return crypto.createHash('md5').update(string).digest('hex');
   }
 
-  // Fetch server time for API key generation
   async fetchServerTime() {
-    try {
-      return new Promise((resolve, reject) => {
-        const options = {
-          hostname: 'api.ultimate-guitar.com',
-          path: '/api/v1/common/hello',
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'UGT_ANDROID/5.10.12 (SM-G973F; Android 13)',
-            'x-ug-client-id': this.deviceId
-          }
-        };
+    return new Promise((resolve) => {
+      const options = {
+        hostname: 'api.ultimate-guitar.com',
+        path: '/api/v1/common/hello',
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'UGT_ANDROID/5.10.12 (SM-G973F; Android 13)',
+          'x-ug-client-id': this.deviceId
+        }
+      };
 
-        const req = https.request(options, (res) => {
-          let data = '';
-          res.on('data', (chunk) => data += chunk);
-          res.on('end', () => {
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => data += chunk);
+        res.on('end', () => {
+          if (res.statusCode === 200) {
             try {
-              if (res.statusCode === 200) {
-                const response = JSON.parse(data);
-                if (response.timestamp) {
-                  const serverTime = new Date(response.timestamp * 1000);
-                  const year = serverTime.getUTCFullYear();
-                  const month = String(serverTime.getUTCMonth() + 1).padStart(2, '0');
-                  const day = String(serverTime.getUTCDate()).padStart(2, '0');
-                  const hour = String(serverTime.getUTCHours()).padStart(2, '0');
-                  resolve(`${year}-${month}-${day}:${hour}`);
-                  return;
-                }
+              const response = JSON.parse(data);
+              if (response.timestamp) {
+                const serverTime = new Date(response.timestamp * 1000);
+                const year = serverTime.getUTCFullYear();
+                const month = String(serverTime.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(serverTime.getUTCDate()).padStart(2, '0');
+                const hour = String(serverTime.getUTCHours()).padStart(2, '0');
+                resolve(`${year}-${month}-${day}:${hour}`);
+                return;
               }
-              // Fallback to local time
-              throw new Error('No valid timestamp in response');
             } catch (error) {
-              reject(error);
+              console.log('Server time fetch failed, using local time:', error.message);
             }
-          });
+          }
+          this.getLocalTime();
+          resolve(this.getLocalTime());
         });
-
-        req.on('error', reject);
-        req.setTimeout(5000, () => reject(new Error('Request timeout')));
-        req.end();
       });
-    } catch (error) {
-      console.log('Server time fetch failed, using local time:', error.message);
-      // Fallback to local time
-      const now = new Date();
-      const year = now.getUTCFullYear();
-      const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-      const day = String(now.getUTCDate()).padStart(2, '0');
-      const hour = String(now.getUTCHours()).padStart(2, '0');
-      return `${year}-${month}-${day}:${hour}`;
-    }
+
+      const handleError = () => {
+        console.log('Server time fetch failed, using local time');
+        resolve(this.getLocalTime());
+      };
+      req.on('error', handleError);
+      req.setTimeout(5000, handleError);
+      req.end();
+    });
+  }
+
+  getLocalTime() {
+    const now = new Date();
+    const year = now.getUTCFullYear();
+    const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(now.getUTCDate()).padStart(2, '0');
+    const hour = String(now.getUTCHours()).padStart(2, '0');
+    return `${year}-${month}-${day}:${hour}`;
   }
 
   // Generate API key
@@ -87,7 +89,7 @@ class UGApiClient {
   }
 
   // Fetch a single tab by ID
-  async fetchTab(tabId) {
+  async fetchTab(tabId, retryCount = 0) {
     if (!this.apiKey) {
       await this.updateApiKey();
     }
@@ -113,10 +115,13 @@ class UGApiClient {
         res.on('data', (chunk) => data += chunk);
         res.on('end', () => {
           if (res.statusCode === 498) {
-            // API key expired, refresh and retry
-            this.updateApiKey().then(() => {
-              setTimeout(() => this.fetchTab(tabId).then(resolve).catch(reject), 1000);
-            }).catch(reject);
+            if (retryCount < this.maxRetries) {
+              this.updateApiKey().then(() => {
+                setTimeout(() => this.fetchTab(tabId, retryCount + 1).then(resolve).catch(reject), 1000);
+              }).catch(reject);
+              return;
+            }
+            reject(new Error(`API key expired after ${this.maxRetries} retries for tab ${tabId}`));
             return;
           }
 

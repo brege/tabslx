@@ -6,8 +6,15 @@
   "bin": {
     "tabslx": "./extract.js"
   },
+  "scripts": {
+    "lint": "biome lint --write",
+    "check": "biome check --write"
+  },
   "dependencies": {
     "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
   },
   "keywords": ["guitar", "tabs", "ultimate-guitar", "tabs-lite"],
   "author": "Wyatt Brege",

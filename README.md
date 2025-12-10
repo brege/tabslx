@@ -2,6 +2,8 @@
 
 Extract guitar tabs from a [**TabsLite** Android app](https://github.com/More-Than-Solitaire/Tabs-Lite) backup file using the Ultimate Guitar API.
 
+> UG has an IP-hostile API, and throttles requests in a sophisticated pattern with a release rotation. You get a couple shots a day to perform a full extraction. Sometimes, you may need to just wait awhile (a week) before you can sync again.
+
 ## Setup
 
 In **Tabs Lite**, go to **Settings** (Guitar in search field) > **Export favorits and playlists**.

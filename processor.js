@@ -5,9 +5,14 @@ const yaml = require('js-yaml');
 const UGApiClient = require('./api');
 
 class TabProcessor {
-  constructor(configPath = './config.yaml') {
+  constructor(configPath = './config.yaml', options = {}) {
     this.config = this.loadConfig(configPath);
-    this.api = new UGApiClient();
+    this.deviceIdPath = path.join(this.config.output_dir, '.device_id');
+    this.ensureOutputDirectory();
+    if (options.refreshDeviceId) {
+      this.refreshDeviceId();
+    }
+    this.api = new UGApiClient(this.deviceIdPath);
   }
 
   loadConfig(configPath = './config.yaml') {
@@ -61,6 +66,18 @@ class TabProcessor {
       return pathValue.replace('~', os.homedir());
     }
     return pathValue;
+  }
+
+  ensureOutputDirectory() {
+    if (!fs.existsSync(this.config.output_dir)) {
+      fs.mkdirSync(this.config.output_dir, { recursive: true });
+    }
+  }
+
+  refreshDeviceId() {
+    if (fs.existsSync(this.deviceIdPath)) {
+      fs.unlinkSync(this.deviceIdPath);
+    }
   }
 
   sanitizeFilename(text) {

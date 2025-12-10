@@ -1,17 +1,51 @@
 const https = require('node:https');
 const crypto = require('node:crypto');
+const fs = require('node:fs');
+const path = require('node:path');
 
 class UGApiClient {
-  constructor() {
-    this.deviceId = this.generateDeviceId();
+  constructor(deviceIdPath) {
+    if (!deviceIdPath) {
+      throw new Error('Device ID path is required');
+    }
+    this.deviceIdPath = deviceIdPath;
+    this.deviceId = this.loadDeviceId();
     this.apiKey = null;
     this.retryCount = 0;
     this.maxRetries = 3;
   }
 
-  // Generate a 16-character hex device ID
+  loadDeviceId() {
+    try {
+      if (fs.existsSync(this.deviceIdPath)) {
+        const storedId = fs.readFileSync(this.deviceIdPath, 'utf8').trim();
+        if (this.isValidDeviceId(storedId)) {
+          return storedId;
+        }
+      }
+    } catch (error) {
+      console.warn(`Warning: Failed to read device ID from ${this.deviceIdPath}: ${error.message}`);
+    }
+    const newId = this.generateDeviceId();
+    this.saveDeviceId(newId);
+    return newId;
+  }
+
+  saveDeviceId(deviceId) {
+    try {
+      fs.mkdirSync(path.dirname(this.deviceIdPath), { recursive: true });
+      fs.writeFileSync(this.deviceIdPath, deviceId, { encoding: 'utf8' });
+    } catch (error) {
+      console.warn(`Warning: Failed to persist device ID to ${this.deviceIdPath}: ${error.message}`);
+    }
+  }
+
+  isValidDeviceId(value) {
+    return typeof value === 'string' && /^[0-9a-f]{16}$/.test(value);
+  }
+
   generateDeviceId() {
-    const chars = '123456789abcdef';
+    const chars = '0123456789abcdef';
     let id = '';
     for (let i = 0; i < 16; i++) {
       id += chars[Math.floor(Math.random() * chars.length)];
@@ -25,7 +59,7 @@ class UGApiClient {
   }
 
   async fetchServerTime() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const options = {
         hostname: 'api.ultimate-guitar.com',
         path: '/api/v1/common/hello',
@@ -51,35 +85,30 @@ class UGApiClient {
                 const year = serverTime.getUTCFullYear();
                 const month = String(serverTime.getUTCMonth() + 1).padStart(2, '0');
                 const day = String(serverTime.getUTCDate()).padStart(2, '0');
-                const hour = String(serverTime.getUTCHours()).padStart(2, '0');
-                resolve(`${year}-${month}-${day}:${hour}`);
+                const hour = serverTime.getUTCHours();
+                const timeStr = `${year}-${month}-${day}:${hour}`;
+                console.log(`Server time fetched: ${timeStr}`);
+                resolve(timeStr);
                 return;
               }
             } catch (error) {
-              console.log('Server time fetch failed, using local time:', error.message);
+              reject(new Error(`Failed to parse server time: ${error.message}`));
+              return;
             }
           }
-          resolve(this.getLocalTime());
+          reject(new Error(`Server time request failed with status ${res.statusCode}`));
         });
       });
 
-      const handleError = () => {
-        console.log('Server time fetch failed, using local time');
-        resolve(this.getLocalTime());
-      };
-      req.on('error', handleError);
-      req.setTimeout(5000, handleError);
+      req.on('error', (error) => {
+        reject(new Error(`Server time fetch error: ${error.message}`));
+      });
+      req.setTimeout(5000, () => {
+        req.destroy();
+        reject(new Error('Server time request timed out'));
+      });
       req.end();
     });
-  }
-
-  getLocalTime() {
-    const now = new Date();
-    const year = now.getUTCFullYear();
-    const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(now.getUTCDate()).padStart(2, '0');
-    const hour = String(now.getUTCHours()).padStart(2, '0');
-    return `${year}-${month}-${day}:${hour}`;
   }
 
   // Generate API key
@@ -87,6 +116,7 @@ class UGApiClient {
     const timeString = await this.fetchServerTime();
     const keyString = `${this.deviceId}${timeString}createLog()`;
     this.apiKey = this.getMd5(keyString);
+    console.log(`API Key generated - Device: ${this.deviceId}, Time: ${timeString}, Key: ${this.apiKey}`);
   }
 
   // Fetch a single tab by ID

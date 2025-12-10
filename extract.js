@@ -6,6 +6,7 @@ async function main() {
   const args = process.argv.slice(2);
   let configPath = './config.yaml';
   let force = false;
+  let refreshDeviceId = false;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -18,6 +19,8 @@ async function main() {
       i++;
     } else if (arg === '--force' || arg === '-f') {
       force = true;
+    } else if (arg === '--refresh' || arg === '-r') {
+      refreshDeviceId = true;
     } else if (arg === '--help' || arg === '-h') {
       console.log(`TabsLite Extractor
 
@@ -27,6 +30,7 @@ Options:
   -c, --config <path>   path to config file (default: ./config.yaml)
   -f, --force           force re-download even if files exist
   -h, --help            show this help message
+  -r, --refresh         delete cached device id for output directory
 
 Config:
  - defaults loaded from config.default.yaml
@@ -43,7 +47,7 @@ Examples:
   }
 
   try {
-    const processor = new TabProcessor(configPath);
+    const processor = new TabProcessor(configPath, { refreshDeviceId });
     await processor.extractAllTabs(force);
     console.log('All done!');
   } catch (error) {

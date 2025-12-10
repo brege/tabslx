@@ -1,4 +1,4 @@
-# TabsLite Extractor
+# tabslx - a Tabs-Lite extractor
 
 Extract guitar tabs from a [**TabsLite** Android app](https://github.com/More-Than-Solitaire/Tabs-Lite) backup file using the Ultimate Guitar API.
 
@@ -6,31 +6,35 @@ Extract guitar tabs from a [**TabsLite** Android app](https://github.com/More-Th
 
 ## Setup
 
-In **Tabs Lite**, go to **Settings** (Guitar in search field) > **Export favorits and playlists**.
-Then transfer the backup file to your computer.
-
+In **Tabs Lite** on your android phone, go to 
+  **Settings** (Guitar in search field) > **Export favorits and playlists**. 
 This will save **`tabslite_backup.json`** on your phone. Copy this to your computer.
 
-1. Install dependencies:
+1. Install dependencies
    ```bash
+   git clone https://github.com/brege/tabslx
    npm install
    ```
 
-2. Configure the extractor.
+2. Configure the extractor
    ```bash
    cp config.default.yaml config.yaml
    ```
-   Then edit the settings.
+   Then edit `config.yaml`
    ```yaml
-   backup_json: "tabslite_backup.json"      # default: ./tabslite_backup.json
-   output_dir: "tabslite-export"            # default: ./tabslite-export
-   cache: true                              # default: true
+   json: "tabslite_backup.json"
+   data: "tabslite-export"
+   cache: true
    filename:
-     lowercase: true                        # default: false
-     replace_spaces_with: "-"               # default: false 
-     pattern: "{artist}---{song}-{id}.txt"  # default: {artist} - {song} ({id})
+     lowercase: false
+     space: "-"
+     id: true
+     format: "{artist}---{song}-{id}.txt"
    ```
-   This example converts filenames to lowercase, replaces spaces with hyphens, and uses keeps the ID in the filename:   
+   - `json` is the exported TabsLite backup.
+   - `data` is the output directory (device id cache lives here).
+   - `filename.space` replaces whitespace with the given string.
+   - `filename.id` toggles whether `{id}` stays in the template.
 
 
 ## Usage
@@ -38,9 +42,9 @@ This will save **`tabslite_backup.json`** on your phone. Copy this to your compu
 **Basic extraction**
 ```bash
 node extract.js
-# or
+
+# add to your path
 npm link
-tabslx
 tabslx --help
 ```
 
@@ -48,6 +52,12 @@ tabslx --help
 ```bash
 tabslx --force
 ```
+
+**Rotate device identity**
+```bash
+tabslx --refresh
+```
+Deletes `<data>/.device_id` before starting so a new ID is generated for that output directory.
 
 **Use custom config**
 ```bash
@@ -57,17 +67,26 @@ If `config.yaml` doesn't exist in the project root, and without `--config`, then
 
 **Filename pattern**
 
-  - Default **`config.default.yaml`**
-    ``` 
+  - With `filename.id: true`
+    ```
+    # "{artist} - {song} [{id}].txt"
+    'The Weakerthans - Virtute The Cat Explains Her Departure [1068619].txt'
+    ```
+  - With `filename.id: false`
+    ```
+    # "{artist} - {song}.txt"
     'The Weakerthans - Virtute The Cat Explains Her Departure.txt'
     ```
-  - With `include_id: true`
+  - Lowercase plus dash spacing:
     ```
-    'The Weakerthans - Virtute The Cat Explains Her Departure (1068619).txt'
-    ```
-  - **README's `config.yaml`** (easier with only one free hand)
-    ```
-    the-weakerthans---virtute-the-cat-explains-her-departure.txt
+    # "{artist}---{song}-{id}.txt"
+    the-weakerthans---virtute-the-cat-explains-her-departure-1068619.txt
     ```
 
+## Acknowledgements
+
 [**TabsLite**](https://github.com/More-Than-Solitaire/Tabs-Lite).
+
+## License
+
+[GPLv3](https://fsf.org/licensing/licenses/gpl-3.0.html)

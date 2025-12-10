@@ -17,7 +17,7 @@ class TabProcessor {
 
   loadConfig(configPath = './config.yaml') {
     // Always load defaults first
-    const defaultConfigPath = path.join(__dirname, 'config.default.yaml');
+    const defaultConfigPath = path.join(__dirname, '..', 'config.default.yaml');
     let config;
 
     try {

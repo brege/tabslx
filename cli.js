@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const TabProcessor = require('./processor');
+const TabProcessor = require('./app/processor');
 
 async function main() {
   const args = process.argv.slice(2);
@@ -24,7 +24,7 @@ async function main() {
     } else if (arg === '--help' || arg === '-h') {
       console.log(`TabsLite Extractor
 
-Usage: node extract.js [options]
+Usage: node cli.js [options]
 
 Options:
   -c, --config <path>   path to config file (default: ./config.yaml)
@@ -38,9 +38,9 @@ Config:
  - copy config.default.yaml to config.yaml to customize
 
 Examples:
-  node extract.js                    # use defaults + config.yaml
-  node extract.js --force            # force re-download
-  node extract.js --config my.yaml   # custom config file
+  node cli.js                    # use defaults + config.yaml
+  node cli.js --force            # force re-download
+  node cli.js --config my.yaml   # custom config file
 `);
       process.exit(0);
     }

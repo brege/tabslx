@@ -41,10 +41,9 @@ This will save **`tabslite_backup.json`** on your phone. Copy this to your compu
 
 **Basic extraction**
 ```bash
-node extract.js
-
-# add to your path
-npm link
+node cli.js
+# or
+tabslx
 tabslx --help
 ```
 

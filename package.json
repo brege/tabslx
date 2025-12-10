@@ -2,9 +2,9 @@
   "name": "tabslx",
   "version": "1.1.0",
   "description": "Extract guitar tabs from Tabs-Lite backup files",
-  "main": "extract.js",
+  "main": "cli.js",
   "bin": {
-    "tabslx": "./extract.js"
+    "tabslx": "./cli.js"
   },
   "scripts": {
     "lint": "biome lint --write",

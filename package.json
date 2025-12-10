@@ -1,6 +1,6 @@
 {
   "name": "tabslx",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Extract guitar tabs from Tabs-Lite backup files",
   "main": "cli.js",
   "bin": {
@@ -17,7 +17,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4"
   },
-  "keywords": ["guitar", "tabs", "ultimate-guitar", "tabs-lite"],
+  "keywords": ["guitar", "chords", "tabs", "ultimate-guitar", "tabs-lite"],
   "author": "Wyatt Brege",
   "license": "GPL-3.0"
 }

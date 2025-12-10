@@ -1,16 +1,12 @@
 # tabslx - TabsLite Extractor Default Configuration
 # Copy to config.yaml and customize
 
-backup_json: tabslite_backup.json
-output_dir: data
+json: tabslite_backup.json
+data: data
 cache: true
-
-formatting:
-  remove_markup: true
-  blank_after_tabs: true
-  include_id: false
 
 filename:
   lowercase: false
-  replace_spaces_with: false
-  pattern: "{artist} - {song} ({id}).txt"
+  space: "-"
+  id: true
+  format: "{artist}---{song}-{id}.txt"

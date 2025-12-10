@@ -7,7 +7,7 @@ const UGApiClient = require('./api');
 class TabProcessor {
   constructor(configPath = './config.yaml', options = {}) {
     this.config = this.loadConfig(configPath);
-    this.deviceIdPath = path.join(this.config.output_dir, '.device_id');
+    this.deviceIdPath = path.join(this.config.data, '.device_id');
     this.ensureOutputDirectory();
     if (options.refreshDeviceId) {
       this.refreshDeviceId();
@@ -40,9 +40,19 @@ class TabProcessor {
       }
     }
 
+    if (!config?.json) {
+      throw new Error('Config is missing required "json" path');
+    }
+    if (!config?.data) {
+      throw new Error('Config is missing required "data" path');
+    }
+    if (!config?.filename?.format) {
+      throw new Error('Config is missing filename.format');
+    }
+
     // Expand home directory paths
-    config.backup_json = this.expandPath(config.backup_json);
-    config.output_dir = this.expandPath(config.output_dir);
+    config.json = this.expandPath(config.json);
+    config.data = this.expandPath(config.data);
 
     return config;
   }
@@ -69,8 +79,8 @@ class TabProcessor {
   }
 
   ensureOutputDirectory() {
-    if (!fs.existsSync(this.config.output_dir)) {
-      fs.mkdirSync(this.config.output_dir, { recursive: true });
+    if (!fs.existsSync(this.config.data)) {
+      fs.mkdirSync(this.config.data, { recursive: true });
     }
   }
 
@@ -115,22 +125,28 @@ class TabProcessor {
 
     let artist = tabData.artist_name || 'Unknown Artist';
     let song = tabData.song_name || 'Unknown Song';
-    const id = tabData.tab_id || tabData.id || 'unknown';
+    let id = tabData.tab_id || tabData.id || 'unknown';
 
     if (filename.lowercase) {
       artist = artist.toLowerCase();
       song = song.toLowerCase();
+      id = String(id).toLowerCase();
     }
 
-    if (filename.replace_spaces_with) {
-      artist = artist.replace(/\s+/g, filename.replace_spaces_with);
-      song = song.replace(/\s+/g, filename.replace_spaces_with);
+    if (filename.space && typeof filename.space === 'string') {
+      artist = artist.replace(/\s+/g, filename.space);
+      song = song.replace(/\s+/g, filename.space);
     }
 
     artist = this.sanitizeFilename(artist);
     song = this.sanitizeFilename(song);
+    if (filename.id === false) {
+      id = '';
+    } else {
+      id = this.sanitizeFilename(String(id));
+    }
 
-    return filename.pattern
+    return filename.format
       .replace('{artist}', artist)
       .replace('{song}', song)
       .replace('{id}', id);
@@ -138,8 +154,6 @@ class TabProcessor {
 
   // Format tab content according to config
   formatContent(tabData) {
-    const { formatting } = this.config;
-
     let content = `Title: ${tabData.song_name}
 Artist: ${tabData.artist_name}
 Album: ${tabData.album_name || 'Unknown'}
@@ -153,10 +167,8 @@ URL: ${tabData.url_web || 'N/A'}
 
 ${tabData.content}`;
 
-    if (formatting.remove_markup) {
-      content = content.replace(/\[(\/?)ch\]/g, '').replace(/\[(\/?)tab\]/g, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-      content = content.replace(/\n{3,}/g, '\n\n');
-    }
+    content = content.replace(/\[(\/?)ch\]/g, '').replace(/\[(\/?)tab\]/g, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    content = content.replace(/\n{3,}/g, '\n\n');
 
     return content;
   }
@@ -169,7 +181,7 @@ ${tabData.content}`;
   // Save tab to file
   saveTab(tabData, force = false) {
     const filename = this.generateFilename(tabData);
-    const filepath = path.join(this.config.output_dir, filename);
+    const filepath = path.join(this.config.data, filename);
 
     // Check cache if enabled and not forcing
     if (!force && this.config.cache && this.fileExists(filepath)) {
@@ -192,13 +204,13 @@ ${tabData.content}`;
   async extractAllTabs(force = false) {
     console.log('Starting tab extraction...');
     console.log('Config:', {
-      backup: this.config.backup_json,
-      output: this.config.output_dir,
+      json: this.config.json,
+      data: this.config.data,
       cache: this.config.cache
     });
 
     // Extract tab IDs
-    const tabIds = this.extractTabIds(this.config.backup_json);
+    const tabIds = this.extractTabIds(this.config.json);
     console.log(`Found ${tabIds.length} unique tab IDs in backup`);
 
     // Initialize API
@@ -238,7 +250,7 @@ ${tabData.content}`;
     console.log(`Successful: ${successful}`);
     console.log(`Cached: ${cached}`);
     console.log(`Failed: ${failed}`);
-    console.log(`Output directory: ${path.resolve(this.config.output_dir)}`);
+    console.log(`Output directory: ${path.resolve(this.config.data)}`);
   }
 }
 

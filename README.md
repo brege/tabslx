@@ -13,7 +13,7 @@ This will save **`tabslite_backup.json`** on your phone. Copy this to your compu
 1. Install dependencies
    ```bash
    git clone https://github.com/brege/tabslx
-   npm install
+   npm install -g
    ```
 
 2. Configure the extractor
@@ -41,9 +41,12 @@ This will save **`tabslite_backup.json`** on your phone. Copy this to your compu
 
 **Basic extraction**
 ```bash
-node cli.js
-# or
-tabslx
+# npm install
+node cli.js --help
+```
+or
+```bash
+npm install -g
 tabslx --help
 ```
 
@@ -62,7 +65,8 @@ Deletes `<data>/.device_id` before starting so a new ID is generated for that ou
 ```bash
 tabslx --config config.yaml
 ```
-If `config.yaml` doesn't exist in the project root, and without `--config`, then `tabslx --config config.default.yaml` will be used implicitly.
+
+Config hierarchy: `config.yaml` > `--config` > `config.default.yaml`.
 
 **Filename pattern**
 
@@ -84,7 +88,7 @@ If `config.yaml` doesn't exist in the project root, and without `--config`, then
 
 ## Acknowledgements
 
-[**TabsLite**](https://github.com/More-Than-Solitaire/Tabs-Lite).
+[**TabsLite**](https://github.com/More-Than-Solitaire/Tabs-Lite)
 
 ## License
 

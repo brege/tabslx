@@ -1,5 +1,5 @@
-const https = require('https');
-const crypto = require('crypto');
+const https = require('node:https');
+const crypto = require('node:crypto');
 
 class UGApiClient {
   constructor() {
@@ -39,7 +39,9 @@ class UGApiClient {
 
       const req = https.request(options, (res) => {
         let data = '';
-        res.on('data', (chunk) => data += chunk);
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
         res.on('end', () => {
           if (res.statusCode === 200) {
             try {
@@ -57,7 +59,6 @@ class UGApiClient {
               console.log('Server time fetch failed, using local time:', error.message);
             }
           }
-          this.getLocalTime();
           resolve(this.getLocalTime());
         });
       });
@@ -84,7 +85,7 @@ class UGApiClient {
   // Generate API key
   async updateApiKey() {
     const timeString = await this.fetchServerTime();
-    const keyString = this.deviceId + timeString + 'createLog()';
+    const keyString = `${this.deviceId}${timeString}createLog()`;
     this.apiKey = this.getMd5(keyString);
   }
 
@@ -112,7 +113,9 @@ class UGApiClient {
 
       const req = https.request(options, (res) => {
         let data = '';
-        res.on('data', (chunk) => data += chunk);
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
         res.on('end', () => {
           if (res.statusCode === 498) {
             if (retryCount < this.maxRetries) {

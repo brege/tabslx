@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const fs = require('node:fs');
+const path = require('node:path');
+const os = require('node:os');
 const yaml = require('js-yaml');
 const UGApiClient = require('./api');
 
@@ -57,7 +57,7 @@ class TabProcessor {
   }
 
   expandPath(pathValue) {
-    if (pathValue && pathValue.startsWith('~')) {
+    if (pathValue?.startsWith('~')) {
       return pathValue.replace('~', os.homedir());
     }
     return pathValue;
@@ -73,18 +73,17 @@ class TabProcessor {
       const tabIds = [];
       const seen = new Set();
 
-      // Extract from playlists in order
       if (backupData.playlists) {
-        backupData.playlists.forEach(playlist => {
+        for (const playlist of backupData.playlists) {
           if (playlist.entries) {
-            playlist.entries.forEach(entry => {
+            for (const entry of playlist.entries) {
               if (entry.tabId && !seen.has(entry.tabId)) {
                 seen.add(entry.tabId);
                 tabIds.push(entry.tabId);
               }
-            });
+            }
           }
-        });
+        }
       }
 
       return tabIds;

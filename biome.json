@@ -14,11 +14,11 @@
         "noUnsafeDeclarationMerging": "error"
       },
       "style": {
-        "noNegationElseIf": "error",
+        "noNegationElse": "error",
         "noNonNullAssertion": "error",
         "noParameterAssign": "error",
         "useConst": "error",
-        "useExponentOperator": "error",
+        "useExponentiationOperator": "error",
         "useTemplate": "error",
         "useWhile": "error"
       },
@@ -46,15 +46,15 @@
     "formatter": {
       "arrowParentheses": "asNeeded",
       "bracketSpacing": true,
-      "indentSize": 2,
+      "indentWidth": 2,
       "indentStyle": "space",
       "jsxQuoteStyle": "double",
       "lineEnding": "lf",
       "lineWidth": 100,
       "quoteProperties": "asNeeded",
-      "quotes": "single",
+      "quoteStyle": "single",
       "semicolons": "always",
-      "trailingComma": "es5"
+      "trailingCommas": "es5"
     },
     "parser": {
       "unsafeParameterDecoratorsEnabled": true
@@ -62,11 +62,10 @@
   },
   "json": {
     "formatter": {
-      "indentSize": 2,
+      "indentWidth": 2,
       "indentStyle": "space",
       "lineEnding": "lf",
-      "lineWidth": 100,
-      "trailingComma": "none"
+      "lineWidth": 100
     }
   }
 }

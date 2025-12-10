@@ -1,8 +1,8 @@
-# TabsLite Extractor Default Configuration
+# tabslx - TabsLite Extractor Default Configuration
 # Copy to config.yaml and customize
 
 backup_json: tabslite_backup.json
-output_dir: tabslite-export
+output_dir: data
 cache: true
 
 formatting:

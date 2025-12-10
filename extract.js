@@ -22,19 +22,19 @@ async function main() {
 Usage: node extract.js [options]
 
 Options:
-  -c, --config <path>   Path to config file (default: ./config.yaml)
-  -f, --force          Force re-download even if files exist
-  -h, --help           Show this help message
+  -c, --config <path>   path to config file (default: ./config.yaml)
+  -f, --force           force re-download even if files exist
+  -h, --help            show this help message
 
 Config:
-  Defaults loaded from config.default.yaml
-  User config.yaml overrides defaults (optional)
-  Copy config.default.yaml to config.yaml to customize
+ - defaults loaded from config.default.yaml
+ - user config.yaml overrides defaults (optional)
+ - copy config.default.yaml to config.yaml to customize
 
 Examples:
-  node extract.js                    # Use defaults + config.yaml
-  node extract.js --force            # Force re-download
-  node extract.js --config my.yaml   # Custom config file
+  node extract.js                    # use defaults + config.yaml
+  node extract.js --force            # force re-download
+  node extract.js --config my.yaml   # custom config file
 `);
       process.exit(0);
     }

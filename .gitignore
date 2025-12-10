@@ -1,36 +1,6 @@
-# Node dependencies
+# npm
 node_modules/
 
-# ESLint ignore file
-.eslintignore
-
-# .docignore files
-*.docignore
-
-# Logs and temp files
-*.log
-*.tmp
-
-# backup files
-*.bak
-
-# macOS system files
-.DS_Store
-
-# Editor/IDE junk
-.vscode/
-*.swp
-*.swo
-*~
-
-# User should copy config.yaml.example to config.yaml
+# user's data
+data/
 config.yaml
-
-# Optional: npm debug files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Optional: ignore output directories (if you add one later)
-# dist/
-# build/

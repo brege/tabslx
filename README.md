@@ -35,22 +35,23 @@ This will save **`tabslite_backup.json`** on your phone. Copy this to your compu
 
 **Basic extraction**
 ```bash
-node extract.js  # [ --help ]
+node extract.js
 # or
 npm link
-tabs-lite-extract  # [ --help ]
+tabslx
+tabslx --help
 ```
 
 **Force re-download** (overwrite files on disk)
 ```bash
-tabs-lite-extract --force
+tabslx --force
 ```
 
 **Use custom config**
 ```bash
-tabs-lite-extract --config config.yaml
+tabslx --config config.yaml
 ```
-If `config.yaml` doesn't exist in the project root, and without `--config`, then `tabs-lite-extract --config config.default.yaml` will be used implicitly.
+If `config.yaml` doesn't exist in the project root, and without `--config`, then `tabslx --config config.default.yaml` will be used implicitly.
 
 **Filename pattern**
 
@@ -62,7 +63,7 @@ If `config.yaml` doesn't exist in the project root, and without `--config`, then
     ```
     'The Weakerthans - Virtute The Cat Explains Her Departure (1068619).txt'
     ```
-  - **README's `config.yaml`**
+  - **README's `config.yaml`** (easier with only one free hand)
     ```
     the-weakerthans---virtute-the-cat-explains-her-departure.txt
     ```

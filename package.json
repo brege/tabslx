@@ -1,15 +1,15 @@
 {
-  "name": "tabslite-extractor",
-  "version": "1.0.0",
-  "description": "Extract guitar tabs from TabsLite backup files",
+  "name": "tabslx",
+  "version": "1.1.0",
+  "description": "Extract guitar tabs from Tabs-Lite backup files",
   "main": "extract.js",
   "bin": {
-    "tabs-lite-extract": "./extract.js"
+    "tabslx": "./extract.js"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
   },
-  "keywords": ["guitar", "tabs", "ultimate-guitar", "tabslite"],
-  "author": "",
+  "keywords": ["guitar", "tabs", "ultimate-guitar", "tabs-lite"],
+  "author": "Wyatt Brege",
   "license": "MIT"
 }

@@ -1,6 +1,6 @@
 {
   "name": "tabslx",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Extract guitar tabs from Tabs-Lite backup files",
   "main": "cli.js",
   "bin": {
@@ -12,10 +12,10 @@
     "test": "timeout 30 node test.js"
   },
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4"
+    "@biomejs/biome": "^2.4.4"
   },
   "keywords": ["guitar", "chords", "tabs", "ultimate-guitar", "tabs-lite"],
   "author": "Wyatt Brege",

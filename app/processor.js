@@ -104,9 +104,13 @@ class TabProcessor {
         for (const playlist of backupData.playlists) {
           if (playlist.entries) {
             for (const entry of playlist.entries) {
-              if (entry.tabId && !seen.has(entry.tabId)) {
-                seen.add(entry.tabId);
-                tabIds.push(entry.tabId);
+              if (entry.tabId) {
+                // match TabsLite IDs in the {7567-}123456 format
+                const tabId = String(entry.tabId).replace(/^\d+-(\d+)$/, '$1');
+                if (!seen.has(tabId)) {
+                  seen.add(tabId);
+                  tabIds.push(tabId);
+                }
               }
             }
           }

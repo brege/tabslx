@@ -2,12 +2,15 @@
 
 Extract guitar tabs from a [**TabsLite** Android app](https://github.com/More-Than-Solitaire/Tabs-Lite) backup file using the Ultimate Guitar API.
 
-> UG has an IP-hostile API, and throttles requests in a sophisticated pattern with a release rotation. You get a couple shots a day to perform a full extraction. Sometimes, you may need to just wait awhile (a week) before you can sync again.
+> [!IMPORTANT]
+> UG's API throttles requests by IP address in a sophisticated release rotation. You get a couple shots a day to perform a full extraction. Sometimes, you may need to just wait awhile (days or a week) before you can sync again.
 
 ## Setup
 
 In **Tabs Lite** on your android phone, go to 
-  **Settings** (Guitar in search field) > **Export favorits and playlists**. 
+
+-  **Settings** (Guitar in search field) > **Export favorites and playlists**. 
+
 This will save **`tabslite_backup.json`** on your phone. Copy this to your computer.
 
 1. Install dependencies
@@ -39,49 +42,27 @@ This will save **`tabslite_backup.json`** on your phone. Copy this to your compu
 
 ## Usage
 
-**Basic extraction**
-```bash
-# npm install
-node cli.js --help
-```
-or
-```bash
-npm install -g
-tabslx --help
-```
-
-**Force re-download** (overwrite files on disk)
-```bash
-tabslx --force
-```
-
-**Rotate device identity**
-```bash
-tabslx --refresh
-```
-Deletes `<data>/.device_id` before starting so a new ID is generated for that output directory.
-
-**Use custom config**
-```bash
-tabslx --config config.yaml
-```
-
-Config hierarchy: `config.yaml` > `--config` > `config.default.yaml`.
+| Command | Description | Notes |
+| --- | --- | --- |
+| **Basic extraction** | `tabslx` | |
+| **Force re-download** | `tabslx --force` | overwrite files on disk | 
+| **Rotate device identity** | `tabslx --refresh` | regenerates `<data>/.device_id` |
+| **Use custom config** | `tabslx --config config.yaml` | hierarchy: `config.yaml` > `--config` > `config.default.yaml` |
 
 **Filename pattern**
 
   - With `filename.id: true`
-    ```
+    ``` yaml
     # "{artist} - {song} [{id}].txt"
     'The Weakerthans - Virtute The Cat Explains Her Departure [1068619].txt'
     ```
   - With `filename.id: false`
-    ```
+    ``` yaml
     # "{artist} - {song}.txt"
     'The Weakerthans - Virtute The Cat Explains Her Departure.txt'
     ```
   - Lowercase plus dash spacing:
-    ```
+    ``` yaml
     # "{artist}---{song}-{id}.txt"
     the-weakerthans---virtute-the-cat-explains-her-departure-1068619.txt
     ```

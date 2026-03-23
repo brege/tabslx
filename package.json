@@ -1,11 +1,17 @@
 {
-  "name": "tabslx",
-  "version": "1.3.0",
+  "name": "@brege/tabslx",
+  "version": "1.4.0",
   "description": "Extract guitar tabs from Tabs-Lite backup files",
-  "main": "cli.js",
   "bin": {
-    "tabslx": "./cli.js"
+    "tabslx": "cli.js"
   },
+  "files": [
+    "cli.js",
+    "app/",
+    "config.default.yaml",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "lint": "biome lint --write",
     "check": "biome check --write",
@@ -15,7 +21,7 @@
     "js-yaml": "^4.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.4"
+    "@biomejs/biome": "^2.4.8"
   },
   "keywords": [
     "guitar",
@@ -25,5 +31,16 @@
     "tabs-lite"
   ],
   "author": "Wyatt Brege",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brege/tabslx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/brege/tabslx/issues"
+  },
+  "homepage": "https://github.com/brege/tabslx#readme",
+  "engines": {
+    "node": ">=22.0.0"
+  }
 }

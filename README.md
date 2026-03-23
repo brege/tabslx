@@ -7,19 +7,18 @@ Extract guitar tabs from a [**TabsLite** Android app](https://github.com/More-Th
 
 ## Setup
 
-In **Tabs Lite** on your android phone, go to 
+In **Tabs Lite** on your android phone, go to
 
--  **Settings** (Guitar in search field) > **Export favorites and playlists**. 
+-  **Settings** (Guitar in search field) > **Export favorites and playlists**.
 
 This will save **`tabslite_backup.json`** on your phone. Copy this to your computer.
 
-1. Install dependencies
+1. Install
    ```bash
-   git clone https://github.com/brege/tabslx
-   npm install -g
+   npm install -g @brege/tabslx
    ```
 
-2. Configure the extractor
+2. Configure
    ```bash
    cp config.default.yaml config.yaml
    ```
@@ -42,12 +41,12 @@ This will save **`tabslite_backup.json`** on your phone. Copy this to your compu
 
 ## Usage
 
-| Command | Description | Notes |
-| --- | --- | --- |
-| **Basic extraction** | `tabslx` | |
-| **Force re-download** | `tabslx --force` | overwrite files on disk | 
-| **Rotate device identity** | `tabslx --refresh` | regenerates `<data>/.device_id` |
-| **Use custom config** | `tabslx --config config.yaml` | hierarchy: `config.yaml` > `--config` > `config.default.yaml` |
+```
+tabslx                          extract tabs using config.yaml
+tabslx --force                  re-download and overwrite existing files
+tabslx --refresh                regenerate the cached device id
+tabslx --config my.yaml         use a specific config file
+```
 
 **Filename pattern**
 

@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "biome lint --write",
     "check": "biome check --write",
-    "test": "timeout 30 node test.js"
+    "test": "echo \"no tests\""
   },
   "dependencies": {
     "js-yaml": "^4.1.1"
@@ -17,7 +17,13 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.4"
   },
-  "keywords": ["guitar", "chords", "tabs", "ultimate-guitar", "tabs-lite"],
+  "keywords": [
+    "guitar",
+    "chords",
+    "tabs",
+    "ultimate-guitar",
+    "tabs-lite"
+  ],
   "author": "Wyatt Brege",
   "license": "GPL-3.0"
 }

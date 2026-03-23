@@ -11,7 +11,6 @@ class UGApiClient {
     this.deviceIdPath = deviceIdPath;
     this.deviceId = this.loadDeviceId();
     this.apiKey = null;
-    this.retryCount = 0;
     this.maxRetries = 3;
   }
 
@@ -36,7 +35,9 @@ class UGApiClient {
       fs.mkdirSync(path.dirname(this.deviceIdPath), { recursive: true });
       fs.writeFileSync(this.deviceIdPath, deviceId, { encoding: 'utf8' });
     } catch (error) {
-      console.warn(`Warning: Failed to persist device ID to ${this.deviceIdPath}: ${error.message}`);
+      console.warn(
+        `Warning: Failed to persist device ID to ${this.deviceIdPath}: ${error.message}`
+      );
     }
   }
 
@@ -45,15 +46,9 @@ class UGApiClient {
   }
 
   generateDeviceId() {
-    const chars = '0123456789abcdef';
-    let id = '';
-    for (let i = 0; i < 16; i++) {
-      id += chars[Math.floor(Math.random() * chars.length)];
-    }
-    return id;
+    return crypto.randomBytes(8).toString('hex');
   }
 
-  // Get MD5 hash
   getMd5(string) {
     return crypto.createHash('md5').update(string).digest('hex');
   }
@@ -65,15 +60,15 @@ class UGApiClient {
         path: '/api/v1/common/hello',
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'User-Agent': 'UGT_ANDROID/5.10.12 (SM-G973F; Android 13)',
-          'x-ug-client-id': this.deviceId
-        }
+          'x-ug-client-id': this.deviceId,
+        },
       };
 
-      const req = https.request(options, (res) => {
+      const req = https.request(options, res => {
         let data = '';
-        res.on('data', (chunk) => {
+        res.on('data', chunk => {
           data += chunk;
         });
         res.on('end', () => {
@@ -100,7 +95,7 @@ class UGApiClient {
         });
       });
 
-      req.on('error', (error) => {
+      req.on('error', error => {
         reject(new Error(`Server time fetch error: ${error.message}`));
       });
       req.setTimeout(5000, () => {
@@ -111,15 +106,15 @@ class UGApiClient {
     });
   }
 
-  // Generate API key
   async updateApiKey() {
     const timeString = await this.fetchServerTime();
     const keyString = `${this.deviceId}${timeString}createLog()`;
     this.apiKey = this.getMd5(keyString);
-    console.log(`API Key generated - Device: ${this.deviceId}, Time: ${timeString}, Key: ${this.apiKey}`);
+    console.log(
+      `API Key generated - Device: ${this.deviceId}, Time: ${timeString}, Key: ${this.apiKey}`
+    );
   }
 
-  // Fetch a single tab by ID
   async fetchTab(tabId, retryCount = 0) {
     if (!this.apiKey) {
       await this.updateApiKey();
@@ -133,25 +128,33 @@ class UGApiClient {
         path: url,
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Accept-Charset': 'utf-8',
           'User-Agent': 'UGT_ANDROID/5.10.12 (SM-G973F; Android 13)',
           'x-ug-client-id': this.deviceId,
-          'x-ug-api-key': this.apiKey
-        }
+          'x-ug-api-key': this.apiKey,
+        },
       };
 
-      const req = https.request(options, (res) => {
+      const req = https.request(options, res => {
         let data = '';
-        res.on('data', (chunk) => {
+        res.on('data', chunk => {
           data += chunk;
         });
         res.on('end', () => {
           if (res.statusCode === 498) {
             if (retryCount < this.maxRetries) {
-              this.updateApiKey().then(() => {
-                setTimeout(() => this.fetchTab(tabId, retryCount + 1).then(resolve).catch(reject), 1000);
-              }).catch(reject);
+              this.updateApiKey()
+                .then(() => {
+                  setTimeout(
+                    () =>
+                      this.fetchTab(tabId, retryCount + 1)
+                        .then(resolve)
+                        .catch(reject),
+                    1000
+                  );
+                })
+                .catch(reject);
               return;
             }
             reject(new Error(`API key expired after ${this.maxRetries} retries for tab ${tabId}`));
@@ -178,7 +181,10 @@ class UGApiClient {
       });
 
       req.on('error', reject);
-      req.setTimeout(10000, () => reject(new Error(`Request timeout for tab ${tabId}`)));
+      req.setTimeout(10000, () => {
+        req.destroy();
+        reject(new Error(`Request timeout for tab ${tabId}`));
+      });
       req.end();
     });
   }

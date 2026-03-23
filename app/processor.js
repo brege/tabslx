@@ -16,7 +16,6 @@ class TabProcessor {
   }
 
   loadConfig(configPath = './config.yaml') {
-    // Always load defaults first
     const defaultConfigPath = path.join(__dirname, '..', 'config.default.yaml');
     let config;
 
@@ -27,16 +26,16 @@ class TabProcessor {
       throw new Error(`Failed to load default config: ${error.message}`);
     }
 
-    // Try to load and merge user config if it exists
     if (fs.existsSync(configPath)) {
       try {
         const userContent = fs.readFileSync(configPath, 'utf8');
         const userConfig = yaml.load(userContent);
 
-        // Deep merge user config over defaults
         config = this.mergeConfig(config, userConfig);
       } catch (error) {
-        console.warn(`Warning: Failed to load user config ${configPath}, using defaults: ${error.message}`);
+        console.warn(
+          `Warning: Failed to load user config ${configPath}, using defaults: ${error.message}`
+        );
       }
     }
 
@@ -50,7 +49,6 @@ class TabProcessor {
       throw new Error('Config is missing filename.format');
     }
 
-    // Expand home directory paths
     config.json = this.expandPath(config.json);
     config.data = this.expandPath(config.data);
 
@@ -123,7 +121,6 @@ class TabProcessor {
     }
   }
 
-  // Generate filename based on config pattern
   generateFilename(tabData) {
     const { filename } = this.config;
 
@@ -150,13 +147,9 @@ class TabProcessor {
       id = this.sanitizeFilename(String(id));
     }
 
-    return filename.format
-      .replace('{artist}', artist)
-      .replace('{song}', song)
-      .replace('{id}', id);
+    return filename.format.replace('{artist}', artist).replace('{song}', song).replace('{id}', id);
   }
 
-  // Format tab content according to config
   formatContent(tabData) {
     let content = `Title: ${tabData.song_name}
 Artist: ${tabData.artist_name}
@@ -171,30 +164,25 @@ URL: ${tabData.url_web || 'N/A'}
 
 ${tabData.content}`;
 
-    content = content.replace(/\[(\/?)ch\]/g, '').replace(/\[(\/?)tab\]/g, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    content = content.replace(/\n{3,}/g, '\n\n');
+    // strip UG markup tags, normalize line endings, collapse blank runs
+    content = content
+      .replace(/\[\/?(?:ch|tab)\]/g, '')
+      .replace(/\r\n?/g, '\n')
+      .replace(/\n{3,}/g, '\n\n');
 
     return content;
   }
 
-  // Check if file already exists (for caching)
-  fileExists(filepath) {
-    return fs.existsSync(filepath);
-  }
-
-  // Save tab to file
   saveTab(tabData, force = false) {
     const filename = this.generateFilename(tabData);
     const filepath = path.join(this.config.data, filename);
 
-    // Check cache if enabled and not forcing
-    if (!force && this.config.cache && this.fileExists(filepath)) {
+    if (!force && this.config.cache && fs.existsSync(filepath)) {
       return { filepath, cached: true };
     }
 
     const content = this.formatContent(tabData);
 
-    // Create output directory if it doesn't exist
     const dir = path.dirname(filepath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -204,20 +192,17 @@ ${tabData.content}`;
     return { filepath, cached: false };
   }
 
-  // Main extraction function
   async extractAllTabs(force = false) {
     console.log('Starting tab extraction...');
     console.log('Config:', {
       json: this.config.json,
       data: this.config.data,
-      cache: this.config.cache
+      cache: this.config.cache,
     });
 
-    // Extract tab IDs
     const tabIds = this.extractTabIds(this.config.json);
     console.log(`Found ${tabIds.length} unique tab IDs in backup`);
 
-    // Initialize API
     await this.api.updateApiKey();
     console.log(`Generated API key for device ${this.api.deviceId}`);
 

@@ -22,9 +22,9 @@ async function main() {
     } else if (arg === '--refresh' || arg === '-r') {
       refreshDeviceId = true;
     } else if (arg === '--help' || arg === '-h') {
-      console.log(`TabsLite Extractor
+      console.log(`tabslx - extract guitar tabs from Tabs-Lite backups
 
-Usage: node cli.js [options]
+Usage: tabslx [options]
 
 Options:
   -c, --config <path>   path to config file (default: ./config.yaml)
@@ -38,9 +38,9 @@ Config:
  - copy config.default.yaml to config.yaml to customize
 
 Examples:
-  node cli.js                    # use defaults + config.yaml
-  node cli.js --force            # force re-download
-  node cli.js --config my.yaml   # custom config file
+  tabslx                    # use defaults + config.yaml
+  tabslx --force            # force re-download
+  tabslx --config my.yaml   # custom config file
 `);
       process.exit(0);
     }
